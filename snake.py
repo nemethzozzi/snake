@@ -97,6 +97,8 @@ class SNAKE:
 class FRUIT:
     def __init__(self):
         self.randomize()
+        self.is_bad_apple = False  # New attribute
+
 
     def draw_fruit(self):
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
@@ -106,12 +108,28 @@ class FRUIT:
         self.x = random.randint(0, cell_number - 1)
         self.y = random.randint(0, cell_number - 1)
         self.pos = Vector2(self.x, self.y)
+        
+class BAD_APPLE:
+    def __init__(self):
+        self.randomize()
+
+    def draw_bad_apple(self):
+        bad_apple_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
+        screen.blit(bad_apple, bad_apple_rect)
+
+    def randomize(self):
+        self.x = random.randint(0, cell_number - 1)
+        self.y = random.randint(0, cell_number - 1)
+        self.pos = Vector2(self.x, self.y)
+
 
 
 class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
+        self.bad_apple = BAD_APPLE()  # Add this line
+
 
     def update(self):
         if not paused:
@@ -123,6 +141,7 @@ class MAIN:
         self.draw_grass()
         self.fruit.draw_fruit()
         self.snake.draw_snake()
+        self.bad_apple.draw_bad_apple()  # Add this line
         self.draw_score()
 
         if paused:
@@ -134,9 +153,14 @@ class MAIN:
             self.snake.add_block()
             self.snake.play_crunch_sound()
 
+        if self.bad_apple.pos == self.snake.body[0]:  # Check for bad apple collision
+            self.bad_apple.randomize()
+            self.snake.body = self.snake.body[:-1]
+
         for block in self.snake.body[1:]:
-            if block == self.fruit.pos:
+            if block == self.fruit.pos or block == self.bad_apple.pos:  # Check for both fruits
                 self.fruit.randomize()
+                self.bad_apple.randomize()
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number:
@@ -207,6 +231,8 @@ class MENU:
 
         # Load the apple image
         self.apple_surface = pygame.image.load('Graphics/apple.png').convert_alpha()
+        self.bad_apple_surface = pygame.image.load('Graphics/bad_apple.png').convert_alpha()
+
 
         self.start_surface = self.normal_font.render(start_text, True, (255, 255, 255))
 
@@ -229,7 +255,7 @@ class MENU:
         # Create a box for the second apple.png image and the "-1" text with light green background
         self.box_rect2 = pygame.Rect(self.box_rect1.right + 20, self.box_rect1.top, self.box_width, self.box_height)
 
-        self.apple_rect2 = self.apple_surface.get_rect(center=(self.box_rect2.centerx, self.box_rect2.centery - 10))
+        self.apple_rect2 = self.bad_apple_surface.get_rect(center=(self.box_rect2.centerx, self.box_rect2.centery - 10))
         self.minus_one_rect = self.minus_one_surface.get_rect(center=(self.box_rect2.centerx, self.box_rect2.centery + 10))
 
         self.start_rect = self.start_surface.get_rect(center=(screen.get_width() // 2, 3 * screen.get_height() // 4))
@@ -247,7 +273,7 @@ class MENU:
 
         # Draw the second box for the second apple.png image and the "-1" text with light green background
         pygame.draw.rect(screen, (144, 238, 144), self.box_rect2)  # Light green color
-        screen.blit(self.apple_surface, self.apple_rect2)  # Same apple.png
+        screen.blit(self.bad_apple_surface, self.apple_rect2)  # Same apple.png
         screen.blit(self.minus_one_surface, self.minus_one_rect)
 
         # Use a bold font for the "Press Enter to Start" text
@@ -264,6 +290,7 @@ cell_number = 20
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple.png').convert_alpha()
+bad_apple = pygame.image.load('Graphics/bad_apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 
 SCREEN_UPDATE = pygame.USEREVENT

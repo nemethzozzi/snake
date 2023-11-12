@@ -94,15 +94,13 @@ class SNAKE:
         self.direction = Vector2(0, 0)
 
 
-class FRUIT:
+class APPLE:
     def __init__(self):
         self.randomize()
-        self.is_bad_apple = False  # New attribute
 
-
-    def draw_fruit(self):
-        fruit_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
-        screen.blit(apple, fruit_rect)
+    def draw_apple(self):
+        apple_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
+        screen.blit(apple, apple_rect)
 
     def randomize(self):
         self.x = random.randint(0, cell_number - 1)
@@ -127,7 +125,7 @@ class BAD_APPLE:
 class MAIN:
     def __init__(self):
         self.snake = SNAKE()
-        self.fruit = FRUIT()
+        self.apple = APPLE()
         self.bad_apple = BAD_APPLE()  # Add this line
 
 
@@ -138,8 +136,8 @@ class MAIN:
             self.check_fail()
 
     def draw_elements(self):
-        self.draw_grass()
-        self.fruit.draw_fruit()
+        self.draw_ground()
+        self.apple.draw_apple()
         self.snake.draw_snake()
         self.bad_apple.draw_bad_apple()  # Add this line
         self.draw_score()
@@ -148,18 +146,21 @@ class MAIN:
             self.draw_paused_screen()
 
     def check_collision(self):
-        if self.fruit.pos == self.snake.body[0]:
-            self.fruit.randomize()
+        if self.apple.pos == self.snake.body[0]:
+            self.apple.randomize()
             self.snake.add_block()
             self.snake.play_crunch_sound()
+
+            # Update the position of the bad_apple when the snake eats a regular apple
+            self.bad_apple.randomize()
 
         if self.bad_apple.pos == self.snake.body[0]:  # Check for bad apple collision
             self.bad_apple.randomize()
             self.snake.body = self.snake.body[:-1]
 
         for block in self.snake.body[1:]:
-            if block == self.fruit.pos or block == self.bad_apple.pos:  # Check for both fruits
-                self.fruit.randomize()
+            if block == self.apple.pos or block == self.bad_apple.pos:  # Check for both apples
+                self.apple.randomize()
                 self.bad_apple.randomize()
 
     def check_fail(self):
@@ -175,19 +176,19 @@ class MAIN:
     def game_over(self):
         self.snake.reset()
 
-    def draw_grass(self):
-        grass_color = (167, 209, 61)
+    def draw_ground(self):
+        ground_color = (120, 120, 120)
         for row in range(cell_number):
             if row % 2 == 0:
                 for col in range(cell_number):
                     if col % 2 == 0:
-                        grass_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
-                        pygame.draw.rect(screen, grass_color, grass_rect)
+                        ground_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
+                        pygame.draw.rect(screen, ground_color, ground_rect)
             else:
                 for col in range(cell_number):
                     if col % 2 != 0:
-                        grass_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
-                        pygame.draw.rect(screen, grass_color, grass_rect)
+                        ground_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
+                        pygame.draw.rect(screen, ground_color, ground_rect)
 
     def draw_score(self):
         score_text = str(len(self.snake.body) - 3)
@@ -267,12 +268,12 @@ class MENU:
         screen.blit(self.goal_surface3, self.goal_rect3)
 
         # Draw the first box for the first apple.png image and the "+1" text
-        pygame.draw.rect(screen, (144, 238, 144), self.box_rect1)
+        pygame.draw.rect(screen, (130, 130, 130), self.box_rect1)
         screen.blit(self.apple_surface, self.apple_rect1)
         screen.blit(self.plus_one_surface, self.plus_one_rect)
 
         # Draw the second box for the second apple.png image and the "-1" text with light green background
-        pygame.draw.rect(screen, (144, 238, 144), self.box_rect2)  # Light green color
+        pygame.draw.rect(screen, (130, 130, 130), self.box_rect2)  # Light green color
         screen.blit(self.bad_apple_surface, self.apple_rect2)  # Same apple.png
         screen.blit(self.minus_one_surface, self.minus_one_rect)
 
@@ -335,7 +336,7 @@ while True:
                     pygame.quit()
                     sys.exit()
 
-    screen.fill((175, 215, 70))
+    screen.fill((130, 130, 130))
 
     if not game_active:
         menu.draw_menu()

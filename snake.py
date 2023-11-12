@@ -26,6 +26,7 @@ class SNAKE:
         self.body_tl = pygame.image.load('Graphics/body_tl.png').convert_alpha()
         self.body_br = pygame.image.load('Graphics/body_br.png').convert_alpha()
         self.body_bl = pygame.image.load('Graphics/body_bl.png').convert_alpha()
+        
         self.crunch_sound = pygame.mixer.Sound('Sound/crunch.wav')
 
     def draw_snake(self):
@@ -126,7 +127,7 @@ class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.apple = APPLE()
-        self.bad_apple = BAD_APPLE()  # Add this line
+        self.bad_apple = BAD_APPLE() 
 
 
     def update(self):
@@ -139,7 +140,7 @@ class MAIN:
         self.draw_ground()
         self.apple.draw_apple()
         self.snake.draw_snake()
-        self.bad_apple.draw_bad_apple()  # Add this line
+        self.bad_apple.draw_bad_apple()
         self.draw_score()
 
         if paused:

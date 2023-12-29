@@ -28,6 +28,8 @@ class SNAKE:
         self.body_bl = pygame.image.load('Graphics/body_bl.png').convert_alpha()
         
         self.crunch_sound = pygame.mixer.Sound('Sound/crunch.wav')
+        self.bad_crunch_sound = pygame.mixer.Sound('Sound/bad_crunch.wav')
+
 
     def draw_snake(self):
         self.update_head_graphics()
@@ -89,6 +91,9 @@ class SNAKE:
 
     def play_crunch_sound(self):
         self.crunch_sound.play()
+
+    def play_bad_crunch_sound(self):
+        self.bad_crunch_sound.play()
 
     def reset(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
@@ -158,6 +163,8 @@ class MAIN:
         if self.bad_apple.pos == self.snake.body[0]:  # Check for bad apple collision
             self.bad_apple.randomize()
             self.snake.body = self.snake.body[:-1]
+            self.snake.play_bad_crunch_sound()
+
 
         for block in self.snake.body[1:]:
             if block == self.apple.pos or block == self.bad_apple.pos:  # Check for both apples
@@ -214,7 +221,7 @@ class MAIN:
 
 class MENU:
     def __init__(self):
-        self.large_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 50)
+        self.large_font = pygame.font.Font('Font/ChunkFive-Regular.otf', 50)
         self.normal_font = pygame.font.Font(None, 36)
 
         welcome_text = "Welcome to the Snake Game"
@@ -293,7 +300,7 @@ screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_si
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple.png').convert_alpha()
 bad_apple = pygame.image.load('Graphics/bad_apple.png').convert_alpha()
-game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+game_font = pygame.font.Font('Font/ChunkFive-Regular.otf', 25)
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 150)
